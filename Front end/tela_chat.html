@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Nutricional</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+        }
+        .card {
+            width: 60%;
+            max-width: 700px;
+            padding: 30px 40px;
+            background-color: #2f2841;
+            border-radius: 20px;
+            box-shadow: 0px 10px 40px #00000056;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h1 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        .input-group {
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            color: #f0ffffde;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+        .input-group input, .input-group select {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background-color: #514869;
+            color: #f0ffffde;
+            font-size: 1.2rem;
+            box-shadow: 0px 10px 40px #00000056;
+            outline: none;
+        }
+        .btn {
+            margin-top: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .card {
+                width: 90%;
+                padding: 20px;
+            }
+            .card h1 {
+                font-size: 2rem;
+            }
+            .input-group label {
+                font-size: 1.2rem;
+            }
+            .input-group input, .input-group select {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Chat Nutricional</h1>
+
+        <div class="input-group">
+            <label for="idade">Idade</label>
+            <input type="number" id="idade" placeholder="Digite sua idade" required>
+        </div>
+
+        <div class="input-group">
+            <label for="altura">Altura (m)</label>
+            <input type="number" id="altura" placeholder="Ex: 1.75" step="0.01" required>
+        </div>
+
+        <div class="input-group">
+            <label for="peso">Peso (kg)</label>
+            <input type="number" id="peso" placeholder="Ex: 70" step="0.1" required>
+        </div>
+
+        <div class="input-group">
+            <label for="objetivo">Objetivo</label>
+            <select id="objetivo" required>
+                <option value="">Selecione</option>
+                <option value="Manter peso">Manter peso</option>
+                <option value="Perder peso">Perder peso</option>
+                <option value="Ganhar peso">Ganhar peso</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="enviarDados()">Gerar Rotina</button>
+    </div>
+
+    <script>
+        async function enviarDados() {
+            const usuario = {
+                // 'sexo' foi removido daqui
+                idade: parseInt(document.getElementById("idade").value),
+                altura: parseFloat(document.getElementById("altura").value),
+                peso: parseFloat(document.getElementById("peso").value),
+                objetivo: document.getElementById("objetivo").value
+            };
+
+            // Validação ajustada para não verificar 'sexo'
+            if (!usuario.idade || !usuario.altura || !usuario.peso || !usuario.objetivo) {
+                alert("Preencha todos os campos!");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:8080/api/rotina/gerar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(usuario)
+                });
+
+                if (!response.ok) {
+                    const erro = await response.text();
+                    console.error("Erro do backend:", erro);
+                    alert("Erro do backend: " + erro);
+                    return;
+                }
+
+                const rotina = await response.json();
+
+                // Salvar no sessionStorage para a próxima tela
+                sessionStorage.setItem("rotinaAlimentar", JSON.stringify(rotina));
+
+                // Redirecionar para a tela correta
+                window.location.href = "Rotina_alimentar.html";
+
+            } catch (error) {
+                console.error("Erro ao gerar rotina:", error);
+                alert("Ocorreu um erro ao gerar sua rotina. Tente novamente.");
+            }
+        }
+    </script>
+
+</body>
+</html>

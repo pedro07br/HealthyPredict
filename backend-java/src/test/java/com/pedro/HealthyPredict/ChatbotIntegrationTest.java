@@ -1,44 +1,39 @@
 package com.pedro.HealthyPredict;
 
-import com.pedro.HealthyPredict.controller.ChatbotController;
 import com.pedro.HealthyPredict.model.RotinaAlimentar;
 import com.pedro.HealthyPredict.model.Usuario;
+import com.pedro.HealthyPredict.service.GeminiService;
+import com.pedro.HealthyPredict.service.NutricionalService;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class ChatbotIntegrationTest {
 
     @Autowired
-    private ChatbotController chatbotController;
+    private GeminiService geminiService;
+
+    @Autowired
+    private NutricionalService nutricionalService;
 
     @Test
-    public void testGerarPlanoIntegracao() {
+    public void testeGerarRotina() {
         Usuario usuario = new Usuario();
+        usuario.setIdade(25);
         usuario.setAltura(1.75);
         usuario.setPeso(70);
-        usuario.setIdade(25);
-        usuario.setObjetivo("manter");
+        usuario.setObjetivo("Manter peso");
 
+        double imc = nutricionalService.calcularIMC(usuario);
+        double tmb = nutricionalService.calcularTMB(usuario);
 
-        RotinaAlimentar rotina = chatbotController.gerarPlano(usuario);
+        RotinaAlimentar rotina = geminiService.gerarRotina(usuario, imc, tmb);
 
-        assertNotNull(rotina, "Rotina não pode ser nula");
-        assertNotNull(rotina.getPlano(), "Plano da rotina não pode ser nulo");
-
-        assertTrue(
-                rotina.getPlano().length() > 10,
-                "Plano da rotina deve conter texto significativo"
-        );
-
-        String plano = rotina.getPlano().toLowerCase();
-        assertTrue(
-                plano.contains("café") || plano.contains("almoço") || plano.contains("jantar"),
-                "O plano deve mencionar pelo menos uma refeição típica"
-        );
-        System.out.println(rotina.getPlano());
+        assertNotNull(rotina);
+        assertNotNull(rotina.getCafeDaManha());
+        assertNotNull(rotina.getAlmoco());
+        assertNotNull(rotina.getJantar());
     }
 }

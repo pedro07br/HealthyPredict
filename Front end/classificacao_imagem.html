@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificação de Alimento</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #201b2c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #2f2841;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 40px #00000056;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card h1 {
+            color: #00ff88;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        input[type="file"] {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: #514869;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0px 10px 40px #00000056;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #05966C;
+            color: white;
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        #resultado {
+            color: #00ff88;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Classificação de Alimento 📸</h1>
+        <input type="file" id="imagem" accept="image/*">
+        <button class="btn" onclick="enviarImagem()">Analisar Alimento</button>
+        <div id="resultado">Selecione uma imagem e clique em "Analisar".</div>
+    </div>
+
+    <script>
+        async function enviarImagem() {
+            const fileInput = document.getElementById('imagem');
+            const file = fileInput.files[0];
+            const resultadoDiv = document.getElementById('resultado');
+
+            if (!file) {
+                alert("Por favor, selecione uma imagem.");
+                return;
+            }
+
+            resultadoDiv.textContent = "Processando imagem... ⏳";
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch("http://localhost:8080/api/alimento/classificar", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const erro = await response.text();
+                    resultadoDiv.textContent = "Erro do backend: " + erro;
+                    return;
+                }
+
+                // Parse do JSON retornado pelo backend
+                const data = await response.json();
+                const nomeAlimento = data.classe;
+
+                resultadoDiv.textContent = "✅ Alimento detectado: " + nomeAlimento;
+
+                // Redireciona para a página correspondente
+                redirecionarTela(nomeAlimento);
+
+            } catch (error) {
+                console.error(error);
+                resultadoDiv.textContent = "❌ Erro ao conectar com o backend.";
+            }
+        }
+
+        function redirecionarTela(classe) {
+            let pagina = "";
+            switch(classe.toLowerCase()) {
+                case "banana":
+                    pagina = "banana.html";
+                    break;
+                case "uva":
+                    pagina = "uva.html";
+                    break;
+                default:
+                    pagina = ""; // se não tiver página específica
+            }
+
+            if (pagina) {
+                // Redireciona após 1 segundo para mostrar a mensagem
+                setTimeout(() => {
+                    window.location.href = pagina;
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -11,6 +11,8 @@ public class NutricionalService {
     }
 
     public double calcularTMB(Usuario usuario) {
-        return 10 * usuario.getPeso() + 6.25 * (usuario.getAltura() * 100) - 5 * usuario.getIdade() + 5;
+        double alturaCm = usuario.getAltura() * 100;
+
+        return (10 * usuario.getPeso()) + (6.25 * alturaCm) - (5 * usuario.getIdade()) + 5;
     }
 }

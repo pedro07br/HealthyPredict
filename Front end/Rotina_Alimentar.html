@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotina Alimentar</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+        }
+        .card {
+            width: 80%;
+            max-width: 800px;
+            padding: 30px 40px;
+            background-color: #2f2841;
+            border-radius: 20px;
+            box-shadow: 0px 10px 40px #00000056;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h1 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        .meal {
+            width: 100%;
+            margin: 15px 0;
+            background-color: #514869;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 30px #00000056;
+        }
+        .meal h2 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .meal ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+        .meal ul li {
+            color: #f0ffffde;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .btn {
+            margin-top: 25px;
+        }
+        @media only screen and (max-width: 600px) {
+            .card {
+                width: 95%;
+                padding: 20px;
+            }
+            .card h1 {
+                font-size: 2rem;
+            }
+            .meal h2 {
+                font-size: 1.5rem;
+            }
+            .meal ul li {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Rotina Alimentar</h1>
+
+        <div class="meal" id="cafe">
+            <h2>Café da Manhã</h2>
+            <ul id="cafe-list"></ul>
+        </div>
+
+        <div class="meal" id="almoco">
+            <h2>Almoço</h2>
+            <ul id="almoco-list"></ul>
+        </div>
+
+        <div class="meal" id="jantar">
+            <h2>Jantar</h2>
+            <ul id="jantar-list"></ul>
+        </div>
+
+        <button class="btn" onclick="voltar()">Voltar</button>
+    </div>
+
+    <script>
+    // Pegar a rotina do sessionStorage
+    const rotina = JSON.parse(sessionStorage.getItem("rotinaAlimentar"));
+
+    function popularLista(elementId, itens) {
+        const ul = document.getElementById(elementId);
+        if (itens && itens.length > 0) {
+            itens.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+        } else {
+            const li = document.createElement("li");
+            li.textContent = "Nenhum item disponível";
+            ul.appendChild(li);
+        }
+    }
+
+    // Verifica se existe rotina
+    if (rotina) {
+        popularLista("cafe-list", rotina.cafeDaManha);
+        popularLista("almoco-list", rotina.almoco);
+        popularLista("jantar-list", rotina.jantar);
+    } else {
+        alert("Nenhuma rotina encontrada! Você será redirecionado.");
+        window.location.href = "tela_chat.html";
+    }
+
+    function voltar() {
+        window.location.href = "tela_chat.html";
+    }
+</script>
+</body>
+</html>
